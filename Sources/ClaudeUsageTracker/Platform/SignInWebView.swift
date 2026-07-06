@@ -5,7 +5,7 @@ struct SignInWebView: NSViewRepresentable {
     var onSessionKey: (String) -> Void
 
     // A current desktop Safari UA so the login page doesn't treat us as an embedded browser.
-    private static let userAgent =
+    static let userAgent =
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
 
     func makeNSView(context: Context) -> WKWebView {
@@ -26,18 +26,40 @@ struct SignInWebView: NSViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
         let onSessionKey: (String) -> Void
         private var pollTask: Task<Void, Never>?
+        private var popupWindow: NSWindow?
+        private var popupWebView: WKWebView?
 
         init(onSessionKey: @escaping (String) -> Void) { self.onSessionKey = onSessionKey }
 
-        // Handle popup windows (e.g. "Continue with Google") by loading them in the same web view.
+        // Open OAuth popups (e.g. "Continue with Google") as a real second window so the
+        // window.opener relationship survives and the provider can post the token back.
         func webView(_ webView: WKWebView,
                      createWebViewWith configuration: WKWebViewConfiguration,
                      for navigationAction: WKNavigationAction,
                      windowFeatures: WKWindowFeatures) -> WKWebView? {
-            if navigationAction.targetFrame == nil {
-                webView.load(navigationAction.request)
-            }
-            return nil
+            let popup = WKWebView(frame: NSRect(x: 0, y: 0, width: 500, height: 650), configuration: configuration)
+            popup.customUserAgent = SignInWebView.userAgent
+            popup.navigationDelegate = self
+            popup.uiDelegate = self
+
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 500, height: 650),
+                styleMask: [.titled, .closable, .resizable],
+                backing: .buffered, defer: false)
+            window.title = "Sign in"
+            window.contentView = popup
+            window.center()
+            window.makeKeyAndOrderFront(nil)
+
+            popupWindow = window
+            popupWebView = popup
+            return popup
+        }
+
+        func webViewDidClose(_ webView: WKWebView) {
+            popupWindow?.close()
+            popupWindow = nil
+            popupWebView = nil
         }
 
         func startPolling(_ webView: WKWebView) {
