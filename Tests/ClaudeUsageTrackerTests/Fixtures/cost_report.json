@@ -1,0 +1,6 @@
+{
+  "data": [
+    { "results": [ { "amount": "12.50", "currency": "USD" } ] },
+    { "results": [ { "amount": "29.68", "currency": "USD" }, { "amount": "0.00", "currency": "USD" } ] }
+  ]
+}
