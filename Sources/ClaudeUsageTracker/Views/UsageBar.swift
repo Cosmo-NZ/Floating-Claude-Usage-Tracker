@@ -22,8 +22,17 @@ struct UsageBar: View {
                     Capsule().fill(.quaternary).frame(height: 6)
                     Capsule().fill(barColor)
                         .frame(width: geo.size.width * (usage?.utilization ?? 0), height: 6)
+                    if let usage {
+                        // Time-elapsed marker: how far through the window we are, for pacing.
+                        let elapsed = TimeProgress.elapsedFraction(resetsAt: usage.resetsAt, windowLength: usage.windowLength)
+                        Rectangle()
+                            .fill(Color.primary.opacity(0.6))
+                            .frame(width: 2, height: 12)
+                            .offset(x: geo.size.width * elapsed - 1)
+                            .help("Marker = how far through the \(kind.title.lowercased()) you are, time-wise")
+                    }
                 }
-            }.frame(height: 6)
+            }.frame(height: 12)
             if let usage {
                 Text("⧗ \(TimeProgress.elapsedString(resetsAt: usage.resetsAt, windowLength: usage.windowLength)) · \(TimeProgress.resetString(resetsAt: usage.resetsAt))")
                     .font(.system(size: 10)).foregroundStyle(.tertiary)

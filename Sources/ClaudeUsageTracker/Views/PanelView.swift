@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct PanelView: View {
     @Bindable var store: UsageStore
@@ -47,6 +48,8 @@ struct PanelView: View {
                     .buttonStyle(.borderless).help("Refresh now")
                 Button { onOpenSettings() } label: { Image(systemName: "gearshape") }
                     .buttonStyle(.borderless).help("Settings")
+                Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }
+                    .buttonStyle(.borderless).help("Quit Claude Usage Tracker")
             }
         }
         .padding(14)
