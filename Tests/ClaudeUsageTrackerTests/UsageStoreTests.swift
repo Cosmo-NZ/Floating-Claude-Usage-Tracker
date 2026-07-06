@@ -27,7 +27,7 @@ final class UsageStoreTests: XCTestCase {
             status: FakeStatus(value: .operational),
             subscription: FakeSubscription(five: five),
             spend: FailingSpend()))
-        let settings = AppSettings.shared
+        let settings = AppSettings(suiteName: "test-\(UUID().uuidString)")
         settings.spendEnabled = true
         let store = UsageStore(settings: settings, clientFactory: factory)
 
@@ -44,7 +44,7 @@ final class UsageStoreTests: XCTestCase {
         let five = WindowUsage(utilization: 0.96, resetsAt: Date().addingTimeInterval(3600), windowLength: 5 * 3600)
         let factory = FakeFactory(providers: .init(
             status: nil, subscription: FakeSubscription(five: five), spend: nil))
-        let settings = AppSettings.shared
+        let settings = AppSettings(suiteName: "test-\(UUID().uuidString)")
         settings.notificationsEnabled = true
         let store = UsageStore(settings: settings, clientFactory: factory)
         var fired: [Double] = []
