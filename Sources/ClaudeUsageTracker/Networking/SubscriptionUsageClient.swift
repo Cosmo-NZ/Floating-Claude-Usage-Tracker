@@ -56,13 +56,31 @@ struct SubscriptionUsageClient: SubscriptionProviding {
     static func parseUsage(_ data: Data, now: Date) throws -> (five: WindowUsage?, seven: WindowUsage?, opus: WindowUsage?) {
         struct Window: Decodable { let utilization: Double?; let resets_at: String? }
         struct Response: Decodable { let five_hour: Window?; let seven_day: Window?; let seven_day_opus: Window? }
-        let iso = ISO8601DateFormatter()
         func map(_ w: Window?, _ kind: WindowKind) -> WindowUsage? {
             guard let w, let util = w.utilization, let resetString = w.resets_at,
-                  let resetsAt = iso.date(from: resetString) else { return nil }
+                  let resetsAt = parseDate(resetString) else { return nil }
             return WindowUsage(utilization: util / 100.0, resetsAt: resetsAt, windowLength: kind.length)
         }
         let r = try JSONDecoder().decode(Response.self, from: data)
         return (map(r.five_hour, .fiveHour), map(r.seven_day, .sevenDay), map(r.seven_day_opus, .sevenDayOpus))
+    }
+
+    /// Parses RFC3339 / ISO-8601 timestamps, tolerating fractional seconds of any precision
+    /// (the API returns microseconds, e.g. "2026-07-06T03:00:00.249261+00:00").
+    static func parseDate(_ s: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let d = fractional.date(from: s) { return d }
+
+        let plain = ISO8601DateFormatter()
+        plain.formatOptions = [.withInternetDateTime]
+        if let d = plain.date(from: s) { return d }
+
+        // Strip fractional seconds (handles >3 fractional digits the formatter rejects).
+        if let dot = s.firstIndex(of: "."),
+           let tz = s[dot...].firstIndex(where: { $0 == "+" || $0 == "-" || $0 == "Z" }) {
+            return plain.date(from: String(s[..<dot]) + String(s[tz...]))
+        }
+        return nil
     }
 }
