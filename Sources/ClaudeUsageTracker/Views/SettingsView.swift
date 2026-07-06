@@ -23,8 +23,8 @@ struct SettingsView: View {
     @State private var showSignIn = false
     @State private var manualKey = ""
     @State private var manualAdminKey = ""
-    @State private var adminKeySaved = KeychainStore.get(.adminKey) != nil
-    @State private var sessionConnected = KeychainStore.get(.sessionKey) != nil
+    @State private var adminKeySaved = KeychainStore.shared.get(.adminKey) != nil
+    @State private var sessionConnected = KeychainStore.shared.get(.sessionKey) != nil
 
     var body: some View {
         NavigationSplitView {
@@ -57,7 +57,7 @@ struct SettingsView: View {
                 Spacer()
                 if sessionConnected {
                     Button("Remove", role: .destructive) {
-                        KeychainStore.set(nil, for: .sessionKey)
+                        KeychainStore.shared.set(nil, for: .sessionKey)
                         sessionConnected = false
                         Task { await store.refresh() }
                     }
@@ -73,7 +73,7 @@ struct SettingsView: View {
                 SecureField("sessionKey value", text: $manualKey)
                 Button("Save") {
                     guard !manualKey.isEmpty else { return }
-                    KeychainStore.set(manualKey, for: .sessionKey)
+                    KeychainStore.shared.set(manualKey, for: .sessionKey)
                     manualKey = ""
                     sessionConnected = true
                     Task { await store.refresh() }
@@ -88,7 +88,7 @@ struct SettingsView: View {
                     Button("Cancel") { showSignIn = false }
                 }.padding()
                 SignInWebView { key in
-                    KeychainStore.set(key, for: .sessionKey)
+                    KeychainStore.shared.set(key, for: .sessionKey)
                     sessionConnected = true
                     showSignIn = false
                     Task { await store.refresh() }
@@ -107,7 +107,7 @@ struct SettingsView: View {
                     SecureField("sk-ant-admin…", text: $manualAdminKey)
                     Button("Save") {
                         guard !manualAdminKey.isEmpty else { return }
-                        KeychainStore.set(manualAdminKey, for: .adminKey)
+                        KeychainStore.shared.set(manualAdminKey, for: .adminKey)
                         manualAdminKey = ""
                         adminKeySaved = true
                         Task { await store.refresh() }
@@ -141,6 +141,12 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Appearance").font(.title2.bold())
             Toggle("Always on top", isOn: $settings.alwaysOnTop)
+            VStack(alignment: .leading) {
+                Text("Panel opacity: \(Int(settings.panelOpacity * 100))%")
+                Slider(value: $settings.panelOpacity, in: 0.3...1.0)
+                HStack { Text("See-through").font(.caption2); Spacer(); Text("Solid").font(.caption2) }
+                    .foregroundStyle(.secondary)
+            }
             Toggle("Show menu bar icon", isOn: $settings.showMenuBarIcon)
                 .onChange(of: settings.showMenuBarIcon) { _, newValue in onMenuBarChanged(newValue) }
         }

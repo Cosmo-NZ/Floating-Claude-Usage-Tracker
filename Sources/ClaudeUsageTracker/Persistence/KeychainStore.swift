@@ -1,12 +1,16 @@
 import Foundation
 import Security
 
-enum KeychainStore {
+struct KeychainStore {
     enum Key: String { case sessionKey, adminKey }
 
-    private static let service = "com.marccramer.ClaudeUsageTracker"
+    /// The production store used by the app. Tests construct their own instance with a
+    /// throwaway service name so they never touch real credentials.
+    static let shared = KeychainStore(service: "com.marccramer.ClaudeUsageTracker")
 
-    static func set(_ value: String?, for key: Key) {
+    let service: String
+
+    func set(_ value: String?, for key: Key) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -19,7 +23,7 @@ enum KeychainStore {
         SecItemAdd(add as CFDictionary, nil)
     }
 
-    static func get(_ key: Key) -> String? {
+    func get(_ key: Key) -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

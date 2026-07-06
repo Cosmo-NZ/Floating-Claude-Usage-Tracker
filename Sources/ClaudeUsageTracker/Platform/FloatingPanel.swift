@@ -24,11 +24,16 @@ final class FloatingPanel: NSPanel {
         contentView = hosting
 
         applyAlwaysOnTop(settings.alwaysOnTop)
+        applyOpacity(settings.panelOpacity)
         restoreOrigin()
     }
 
     func applyAlwaysOnTop(_ on: Bool) {
         level = on ? .floating : .normal
+    }
+
+    func applyOpacity(_ value: Double) {
+        alphaValue = max(0.3, min(1.0, value))
     }
 
     private func restoreOrigin() {

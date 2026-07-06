@@ -28,6 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         store.start()
         observeAlwaysOnTop()
+        observeOpacity()
         observeSnapshot()
     }
 
@@ -37,6 +38,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 guard let self else { return }
                 self.panel.applyAlwaysOnTop(self.settings.alwaysOnTop)
                 self.observeAlwaysOnTop()
+            }
+        }
+    }
+
+    private func observeOpacity() {
+        withObservationTracking { _ = settings.panelOpacity } onChange: { [weak self] in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.panel.applyOpacity(self.settings.panelOpacity)
+                self.observeOpacity()
             }
         }
     }

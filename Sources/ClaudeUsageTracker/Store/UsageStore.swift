@@ -86,8 +86,8 @@ protocol ClientFactory: Sendable {
 struct LiveClientFactory: ClientFactory {
     @MainActor func makeProviders(settings: AppSettings) -> UsageStore.ClientProviders {
         let status = StatusClient()
-        let subscription = KeychainStore.get(.sessionKey).map { SubscriptionUsageClient(sessionKey: $0) }
-        let spend = (settings.spendEnabled ? KeychainStore.get(.adminKey) : nil).map { ConsoleSpendClient(adminKey: $0) }
+        let subscription = KeychainStore.shared.get(.sessionKey).map { SubscriptionUsageClient(sessionKey: $0) }
+        let spend = (settings.spendEnabled ? KeychainStore.shared.get(.adminKey) : nil).map { ConsoleSpendClient(adminKey: $0) }
         return .init(status: status, subscription: subscription, spend: spend)
     }
 }

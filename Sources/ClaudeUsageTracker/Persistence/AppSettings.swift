@@ -13,6 +13,7 @@ final class AppSettings {
     var notificationsEnabled: Bool { didSet { defaults.set(notificationsEnabled, forKey: "notificationsEnabled") } }
     var launchAtLogin: Bool { didSet { defaults.set(launchAtLogin, forKey: "launchAtLogin") } }
     var alwaysOnTop: Bool { didSet { defaults.set(alwaysOnTop, forKey: "alwaysOnTop") } }
+    var panelOpacity: Double { didSet { defaults.set(panelOpacity, forKey: "panelOpacity") } }
     var showMenuBarIcon: Bool { didSet { defaults.set(showMenuBarIcon, forKey: "showMenuBarIcon") } }
     var panelOriginX: Double { didSet { defaults.set(panelOriginX, forKey: "panelOriginX") } }
     var panelOriginY: Double { didSet { defaults.set(panelOriginY, forKey: "panelOriginY") } }
@@ -23,6 +24,7 @@ final class AppSettings {
         defaults.register(defaults: [
             "refreshInterval": 30.0,
             "alwaysOnTop": true,
+            "panelOpacity": 1.0,
             "notificationsEnabled": true,
             "panelOriginX": -1.0,
             "panelOriginY": -1.0,
@@ -32,6 +34,7 @@ final class AppSettings {
         notificationsEnabled = defaults.bool(forKey: "notificationsEnabled")
         launchAtLogin = defaults.bool(forKey: "launchAtLogin")
         alwaysOnTop = defaults.bool(forKey: "alwaysOnTop")
+        panelOpacity = defaults.double(forKey: "panelOpacity")
         showMenuBarIcon = defaults.bool(forKey: "showMenuBarIcon")
         panelOriginX = defaults.double(forKey: "panelOriginX")
         panelOriginY = defaults.double(forKey: "panelOriginY")
