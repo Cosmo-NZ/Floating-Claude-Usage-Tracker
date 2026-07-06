@@ -24,7 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if settings.showMenuBarIcon {
             menuBar.setVisible(true, store: store, onOpenSettings: { [weak self] in self?.openSettings() })
         }
-        LoginItemManager.setEnabled(settings.launchAtLogin)
+        if settings.launchAtLogin { LoginItemManager.setEnabled(true) }
 
         store.start()
         observeAlwaysOnTop()

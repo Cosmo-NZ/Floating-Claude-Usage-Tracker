@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class AppSettings {
-    static let shared = AppSettings(suiteName: "com.marccramer.ClaudeUsageTracker")
+    static let shared = AppSettings(suiteName: "com.marccramer.ClaudeUsageTracker.settings")
 
     @ObservationIgnored private let defaults: UserDefaults
 
