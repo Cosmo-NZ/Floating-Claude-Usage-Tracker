@@ -13,7 +13,19 @@ swift test
 # Build the .app bundle and launch it
 ./scripts/run.sh            # debug build + open
 ./scripts/build_app.sh      # release build only -> build/ClaudeUsageTracker.app
+
+# Package a drag-to-Applications installer
+./scripts/make_dmg.sh       # -> build/ClaudeUsageTracker.dmg
 ```
+
+## Distribution
+
+`make_dmg.sh` produces `build/ClaudeUsageTracker.dmg` with the standard drag-to-Applications
+layout. It's signed with the local self-signed identity, so it installs cleanly on **this** Mac.
+To share it with **other** people's Macs without Gatekeeper warnings, the app must be signed with
+an Apple **Developer ID** certificate and **notarized** (`xcrun notarytool`). Without that, other
+users would need to right-click → Open the first time (or run
+`xattr -dr com.apple.quarantine /Applications/ClaudeUsageTracker.app`).
 
 Open in Xcode with **File ▸ Open** on `Package.swift` if you prefer the IDE.
 

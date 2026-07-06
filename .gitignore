@@ -2,3 +2,6 @@
 build/
 .DS_Store
 Resources/AppIcon.iconset/
+
+dmg_staging/
+rw.dmg
