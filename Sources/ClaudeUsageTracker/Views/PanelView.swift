@@ -7,12 +7,14 @@ struct PanelView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
+            HStack(spacing: 6) {
                 Text("Claude Usage").font(.system(size: 13, weight: .bold))
                 Spacer()
+                Text("Always on top")
+                    .font(.system(size: 10)).foregroundStyle(.secondary)
                 Toggle("", isOn: $settings.alwaysOnTop)
                     .toggleStyle(.switch).labelsHidden().scaleEffect(0.7)
-                    .help("Always on top")
+                    .help("Keep the panel above all other windows")
             }
             UsageBar(kind: .fiveHour, usage: store.snapshot.fiveHour,
                      hasError: store.snapshot.sourceErrors[.subscription] != nil)
