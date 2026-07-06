@@ -48,6 +48,7 @@ struct SignInWebView: NSViewRepresentable {
                 backing: .buffered, defer: false)
             window.title = "Sign in"
             window.contentView = popup
+            window.isReleasedWhenClosed = false
             window.center()
             window.makeKeyAndOrderFront(nil)
 
@@ -57,9 +58,10 @@ struct SignInWebView: NSViewRepresentable {
         }
 
         func webViewDidClose(_ webView: WKWebView) {
-            popupWindow?.close()
+            let window = popupWindow
             popupWindow = nil
             popupWebView = nil
+            DispatchQueue.main.async { window?.close() }
         }
 
         func startPolling(_ webView: WKWebView) {
