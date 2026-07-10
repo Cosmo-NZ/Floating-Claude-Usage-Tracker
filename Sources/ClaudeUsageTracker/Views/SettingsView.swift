@@ -7,12 +7,14 @@ struct SettingsView: View {
     var onMenuBarChanged: (Bool) -> Void
 
     enum Section: String, CaseIterable, Identifiable {
-        case claude = "Claude.ai", api = "API Console", general = "General", appearance = "Appearance"
+        case claude = "Claude.ai", api = "API Console", fable = "Fable",
+             general = "General", appearance = "Appearance"
         var id: String { rawValue }
         var icon: String {
             switch self {
             case .claude: return "key.fill"
             case .api: return "dollarsign.circle"
+            case .fable: return "sparkles"
             case .general: return "gearshape"
             case .appearance: return "paintbrush"
             }
@@ -42,6 +44,7 @@ struct SettingsView: View {
         switch selection {
         case .claude: claudePane
         case .api: apiPane
+        case .fable: fablePane
         case .general: generalPane
         case .appearance: appearancePane
         }
@@ -67,8 +70,6 @@ struct SettingsView: View {
                 Label("Sign in to Claude.ai", systemImage: "globe")
             }
             .buttonStyle(.borderedProminent)
-            Toggle("Track Fable weekly usage", isOn: $settings.trackFable)
-                .help("Show the per-model Fable weekly limit, as seen in the Claude app's usage area")
             Divider()
             Text("Advanced: paste session key").font(.caption).foregroundStyle(.secondary)
             HStack {
@@ -119,6 +120,17 @@ struct SettingsView: View {
                     Label("Key saved", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
                 }
             }
+        }
+    }
+
+    private var fablePane: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Fable").font(.title2.bold())
+            Text("Track the per-model Fable weekly limit, as shown in the Claude app's usage area.")
+                .foregroundStyle(.secondary)
+            Toggle("Track Fable weekly usage", isOn: $settings.trackFable)
+            Text("When on, a Weekly (Fable) row appears in the floating panel.")
+                .font(.caption).foregroundStyle(.secondary)
         }
     }
 
