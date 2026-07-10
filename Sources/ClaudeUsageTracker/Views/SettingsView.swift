@@ -67,6 +67,8 @@ struct SettingsView: View {
                 Label("Sign in to Claude.ai", systemImage: "globe")
             }
             .buttonStyle(.borderedProminent)
+            Toggle("Track Fable weekly usage", isOn: $settings.trackFable)
+                .help("Show the per-model Fable weekly limit, as seen in the Claude app's usage area")
             Divider()
             Text("Advanced: paste session key").font(.caption).foregroundStyle(.secondary)
             HStack {

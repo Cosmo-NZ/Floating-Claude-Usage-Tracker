@@ -1,12 +1,12 @@
 import Foundation
 
 enum WindowKind: CaseIterable {
-    case fiveHour, sevenDay, sevenDayOpus
+    case fiveHour, sevenDay, sevenDayOpus, weeklyFable
 
     var length: TimeInterval {
         switch self {
         case .fiveHour: return 5 * 3600
-        case .sevenDay, .sevenDayOpus: return 7 * 24 * 3600
+        case .sevenDay, .sevenDayOpus, .weeklyFable: return 7 * 24 * 3600
         }
     }
 
@@ -15,6 +15,7 @@ enum WindowKind: CaseIterable {
         case .fiveHour: return "Session"
         case .sevenDay: return "Weekly"
         case .sevenDayOpus: return "Weekly (Opus)"
+        case .weeklyFable: return "Weekly (Fable)"
         }
     }
 }
@@ -57,13 +58,14 @@ struct UsageSnapshot {
     var fiveHour: WindowUsage?
     var sevenDay: WindowUsage?
     var sevenDayOpus: WindowUsage?
+    var weeklyFable: WindowUsage?
     var monthlySpendUSD: Double?
     var status: ServiceStatus
     var lastUpdated: Date?
     var sourceErrors: [Source: String]
 
     static var empty: UsageSnapshot {
-        UsageSnapshot(fiveHour: nil, sevenDay: nil, sevenDayOpus: nil,
+        UsageSnapshot(fiveHour: nil, sevenDay: nil, sevenDayOpus: nil, weeklyFable: nil,
                       monthlySpendUSD: nil, status: .unknown,
                       lastUpdated: nil, sourceErrors: [:])
     }
@@ -73,6 +75,7 @@ struct UsageSnapshot {
         case .fiveHour: return fiveHour
         case .sevenDay: return sevenDay
         case .sevenDayOpus: return sevenDayOpus
+        case .weeklyFable: return weeklyFable
         }
     }
 }

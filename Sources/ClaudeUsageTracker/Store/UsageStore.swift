@@ -50,7 +50,8 @@ final class UsageStore {
         if let subscription = providers.subscription {
             do {
                 let u = try await subscription.fetchUsage()
-                next.fiveHour = u.five; next.sevenDay = u.seven; next.sevenDayOpus = u.opus
+                next.fiveHour = u.fiveHour; next.sevenDay = u.sevenDay; next.sevenDayOpus = u.sevenDayOpus
+                next.weeklyFable = settings.trackFable ? u.weeklyFable : nil
             } catch { next.sourceErrors[.subscription] = error.localizedDescription }
         }
 

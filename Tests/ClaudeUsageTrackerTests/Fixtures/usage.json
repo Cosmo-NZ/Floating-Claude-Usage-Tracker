@@ -1,5 +1,11 @@
 {
   "five_hour":       { "utilization": 42.0, "resets_at": "2026-07-06T17:00:00.249261+00:00" },
   "seven_day":       { "utilization": 63.0, "resets_at": "2026-07-09T00:00:00.000000+00:00" },
-  "seven_day_opus":  { "utilization": 12.0, "resets_at": "2026-07-09T00:00:00.000000+00:00" }
+  "seven_day_opus":  { "utilization": 12.0, "resets_at": "2026-07-09T00:00:00.000000+00:00" },
+  "limits": [
+    { "kind": "session",       "percent": 42, "resets_at": "2026-07-06T17:00:00.249261+00:00", "scope": null },
+    { "kind": "weekly_all",    "percent": 63, "resets_at": "2026-07-09T00:00:00.000000+00:00", "scope": null },
+    { "kind": "weekly_scoped", "percent": 9,  "resets_at": "2026-07-09T00:00:00.000000+00:00",
+      "scope": { "model": { "id": null, "display_name": "Fable" }, "surface": null } }
+  ]
 }

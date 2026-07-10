@@ -2,9 +2,16 @@ import Foundation
 
 protocol StatusProviding: Sendable { func fetchStatus() async throws -> ServiceStatus }
 protocol SubscriptionProviding: Sendable {
-    func fetchUsage() async throws -> (five: WindowUsage?, seven: WindowUsage?, opus: WindowUsage?)
+    func fetchUsage() async throws -> SubscriptionUsage
 }
 protocol SpendProviding: Sendable { func fetchMonthlySpendUSD() async throws -> Double }
+
+struct SubscriptionUsage: Equatable {
+    var fiveHour: WindowUsage?
+    var sevenDay: WindowUsage?
+    var sevenDayOpus: WindowUsage?
+    var weeklyFable: WindowUsage?
+}
 
 struct HTTPError: Error, LocalizedError {
     let status: Int

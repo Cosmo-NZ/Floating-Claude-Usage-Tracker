@@ -24,6 +24,10 @@ struct PanelView: View {
             if let opus = store.snapshot.sevenDayOpus {
                 UsageBar(kind: .sevenDayOpus, usage: opus, hasError: false)
             }
+            if settings.trackFable {
+                UsageBar(kind: .weeklyFable, usage: store.snapshot.weeklyFable,
+                         hasError: store.snapshot.sourceErrors[.subscription] != nil)
+            }
             if settings.spendEnabled {
                 HStack {
                     Text("API spend").font(.system(size: 12, weight: .semibold))

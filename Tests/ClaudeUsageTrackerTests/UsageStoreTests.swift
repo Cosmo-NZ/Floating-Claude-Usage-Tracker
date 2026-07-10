@@ -9,8 +9,8 @@ final class UsageStoreTests: XCTestCase {
     }
     struct FakeSubscription: SubscriptionProviding {
         let five: WindowUsage?
-        func fetchUsage() async throws -> (five: WindowUsage?, seven: WindowUsage?, opus: WindowUsage?) {
-            (five, nil, nil)
+        func fetchUsage() async throws -> SubscriptionUsage {
+            SubscriptionUsage(fiveHour: five, sevenDay: nil, sevenDayOpus: nil, weeklyFable: nil)
         }
     }
     struct FailingSpend: SpendProviding {

@@ -22,7 +22,7 @@ struct SubscriptionUsageClient: SubscriptionProviding {
         ]
     }
 
-    func fetchUsage() async throws -> (five: WindowUsage?, seven: WindowUsage?, opus: WindowUsage?) {
+    func fetchUsage() async throws -> SubscriptionUsage {
         let orgID = try await fetchOrgID()
         let url = URL(string: "https://claude.ai/api/organizations/\(orgID)/usage")!
         let data: Data
@@ -53,16 +53,46 @@ struct SubscriptionUsageClient: SubscriptionProviding {
         return first.uuid
     }
 
-    static func parseUsage(_ data: Data, now: Date) throws -> (five: WindowUsage?, seven: WindowUsage?, opus: WindowUsage?) {
+    static func parseUsage(_ data: Data, now: Date) throws -> SubscriptionUsage {
         struct Window: Decodable { let utilization: Double?; let resets_at: String? }
-        struct Response: Decodable { let five_hour: Window?; let seven_day: Window?; let seven_day_opus: Window? }
+        struct Limit: Decodable {
+            struct Scope: Decodable { struct Model: Decodable { let display_name: String? }; let model: Model? }
+            let percent: Double?
+            let resets_at: String?
+            let scope: Scope?
+        }
+        struct Response: Decodable {
+            let five_hour: Window?
+            let seven_day: Window?
+            let seven_day_opus: Window?
+            let limits: [Limit]?
+        }
         func map(_ w: Window?, _ kind: WindowKind) -> WindowUsage? {
             guard let w, let util = w.utilization, let resetString = w.resets_at,
                   let resetsAt = parseDate(resetString) else { return nil }
             return WindowUsage(utilization: util / 100.0, resetsAt: resetsAt, windowLength: kind.length)
         }
         let r = try JSONDecoder().decode(Response.self, from: data)
-        return (map(r.five_hour, .fiveHour), map(r.seven_day, .sevenDay), map(r.seven_day_opus, .sevenDayOpus))
+        let sevenDay = map(r.seven_day, .sevenDay)
+
+        // Per-model weekly usage (e.g. Fable) lives in the `limits` array as a scoped weekly limit.
+        // At 0% usage the API omits its `resets_at`, so fall back to the overall weekly reset
+        // (the scoped weekly shares the same 7-day cadence).
+        func scopedWeekly(model: String, fallbackReset: Date?) -> WindowUsage? {
+            guard let limit = (r.limits ?? []).first(where: {
+                      $0.scope?.model?.display_name?.caseInsensitiveCompare(model) == .orderedSame
+                  }),
+                  let percent = limit.percent else { return nil }
+            let resetsAt = limit.resets_at.flatMap { parseDate($0) } ?? fallbackReset
+            guard let resetsAt else { return nil }
+            return WindowUsage(utilization: percent / 100.0, resetsAt: resetsAt, windowLength: WindowKind.weeklyFable.length)
+        }
+
+        return SubscriptionUsage(
+            fiveHour: map(r.five_hour, .fiveHour),
+            sevenDay: sevenDay,
+            sevenDayOpus: map(r.seven_day_opus, .sevenDayOpus),
+            weeklyFable: scopedWeekly(model: "Fable", fallbackReset: sevenDay?.resetsAt))
     }
 
     /// Parses RFC3339 / ISO-8601 timestamps, tolerating fractional seconds of any precision

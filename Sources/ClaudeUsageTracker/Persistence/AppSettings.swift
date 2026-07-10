@@ -10,6 +10,7 @@ final class AppSettings {
 
     var refreshInterval: Double { didSet { defaults.set(refreshInterval, forKey: "refreshInterval") } }
     var spendEnabled: Bool { didSet { defaults.set(spendEnabled, forKey: "spendEnabled") } }
+    var trackFable: Bool { didSet { defaults.set(trackFable, forKey: "trackFable") } }
     var notificationsEnabled: Bool { didSet { defaults.set(notificationsEnabled, forKey: "notificationsEnabled") } }
     var launchAtLogin: Bool { didSet { defaults.set(launchAtLogin, forKey: "launchAtLogin") } }
     var alwaysOnTop: Bool { didSet { defaults.set(alwaysOnTop, forKey: "alwaysOnTop") } }
@@ -31,6 +32,7 @@ final class AppSettings {
         ])
         refreshInterval = defaults.double(forKey: "refreshInterval")
         spendEnabled = defaults.bool(forKey: "spendEnabled")
+        trackFable = defaults.bool(forKey: "trackFable")
         notificationsEnabled = defaults.bool(forKey: "notificationsEnabled")
         launchAtLogin = defaults.bool(forKey: "launchAtLogin")
         alwaysOnTop = defaults.bool(forKey: "alwaysOnTop")
