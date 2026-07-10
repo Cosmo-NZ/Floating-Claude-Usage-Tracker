@@ -26,6 +26,10 @@ final class FloatingPanel: NSPanel {
         applyAlwaysOnTop(settings.alwaysOnTop)
         applyOpacity(settings.panelOpacity)
         restoreOrigin()
+
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(screensChanged),
+            name: NSApplication.didChangeScreenParametersNotification, object: nil)
     }
 
     func applyAlwaysOnTop(_ on: Bool) {
@@ -37,11 +41,18 @@ final class FloatingPanel: NSPanel {
     }
 
     private func restoreOrigin() {
-        if settings.panelOriginX >= 0, settings.panelOriginY >= 0 {
-            setFrameOrigin(NSPoint(x: settings.panelOriginX, y: settings.panelOriginY))
-        } else if let screen = NSScreen.main {
-            let f = screen.visibleFrame
-            setFrameOrigin(NSPoint(x: f.maxX - 300, y: f.maxY - 280))
+        let saved: CGPoint? = (settings.panelOriginX >= 0 && settings.panelOriginY >= 0)
+            ? CGPoint(x: settings.panelOriginX, y: settings.panelOriginY) : nil
+        let frames = NSScreen.screens.map { $0.visibleFrame }
+        setFrameOrigin(PanelPlacement.resolvedOrigin(saved: saved, size: frame.size, visibleFrames: frames))
+    }
+
+    /// Re-check placement when displays are added/removed/rearranged so the panel never
+    /// gets stranded off-screen while running.
+    @objc private func screensChanged() {
+        let frames = NSScreen.screens.map { $0.visibleFrame }
+        if !PanelPlacement.isVisible(origin: frame.origin, size: frame.size, visibleFrames: frames) {
+            setFrameOrigin(PanelPlacement.fallbackOrigin(size: frame.size, visibleFrames: frames))
         }
     }
 
