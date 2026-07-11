@@ -154,15 +154,28 @@ struct SettingsView: View {
     private var appearancePane: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Appearance").font(.title2.bold())
-            Toggle("Always on top", isOn: $settings.alwaysOnTop)
+            VStack(alignment: .leading, spacing: 2) {
+                Toggle("Always on top", isOn: $settings.alwaysOnTop)
+                Text(settings.alwaysOnTop
+                     ? "The panel stays visible above other windows."
+                     : "Panel is hidden; click the menu bar icon to show/hide it.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             VStack(alignment: .leading) {
                 Text("Panel opacity: \(Int(settings.panelOpacity * 100))%")
                 Slider(value: $settings.panelOpacity, in: 0.3...1.0)
                 HStack { Text("See-through").font(.caption2); Spacer(); Text("Solid").font(.caption2) }
                     .foregroundStyle(.secondary)
             }
-            Toggle("Show menu bar icon", isOn: $settings.showMenuBarIcon)
-                .onChange(of: settings.showMenuBarIcon) { _, newValue in onMenuBarChanged(newValue) }
+            VStack(alignment: .leading, spacing: 2) {
+                Toggle("Show menu bar icon", isOn: $settings.showMenuBarIcon)
+                    .onChange(of: settings.showMenuBarIcon) { _, newValue in onMenuBarChanged(newValue) }
+                    .disabled(!settings.alwaysOnTop)
+                if !settings.alwaysOnTop {
+                    Text("Kept on while “Always on top” is off, so the panel stays reachable.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
         }
     }
 }

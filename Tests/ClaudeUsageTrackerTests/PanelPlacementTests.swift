@@ -38,4 +38,20 @@ final class PanelPlacementTests: XCTestCase {
         let result = PanelPlacement.resolvedOrigin(saved: saved, size: size, visibleFrames: [mainScreen, second])
         XCTAssertEqual(result, saved)
     }
+
+    func testPopoverOriginSitsBelowIconAndCentered() {
+        let icon = CGRect(x: 1200, y: 1380, width: 40, height: 22) // near top, bottom-left space
+        let result = PanelPlacement.popoverOrigin(iconFrame: icon, panelSize: size, visibleFrame: mainScreen)
+        // Centered horizontally under the icon.
+        XCTAssertEqual(result.x, icon.midX - size.width / 2, accuracy: 0.001)
+        // Panel top sits just below the icon (top = origin.y + height).
+        XCTAssertEqual(result.y + size.height, icon.minY - 4, accuracy: 0.001)
+    }
+
+    func testPopoverOriginClampsToScreenAtRightEdge() {
+        let icon = CGRect(x: 2540, y: 1380, width: 20, height: 22) // icon at far right
+        let result = PanelPlacement.popoverOrigin(iconFrame: icon, panelSize: size, visibleFrame: mainScreen)
+        XCTAssertLessThanOrEqual(result.x + size.width, mainScreen.maxX) // stays on screen
+        XCTAssertEqual(result.x, mainScreen.maxX - size.width - 8, accuracy: 0.001)
+    }
 }

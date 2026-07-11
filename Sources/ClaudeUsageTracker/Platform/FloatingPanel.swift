@@ -40,12 +40,25 @@ final class FloatingPanel: NSPanel {
         alphaValue = max(0.3, min(1.0, value))
     }
 
+    /// Restore the persisted floating position, validated against current screens.
+    func restoreSavedOrigin() { restoreOrigin() }
+
     private func restoreOrigin() {
         let saved: CGPoint? = (settings.panelOriginX >= 0 && settings.panelOriginY >= 0)
             ? CGPoint(x: settings.panelOriginX, y: settings.panelOriginY) : nil
         let frames = NSScreen.screens.map { $0.visibleFrame }
         setFrameOrigin(PanelPlacement.resolvedOrigin(saved: saved, size: frame.size, visibleFrames: frames))
     }
+
+    /// Position the panel without persisting (used for the transient menu-bar popover, so it
+    /// doesn't overwrite the remembered floating position).
+    func setPopoverOrigin(_ point: CGPoint) {
+        persistPosition = false
+        setFrameOrigin(point)
+        persistPosition = true
+    }
+
+    private var persistPosition = true
 
     /// Re-check placement when displays are added/removed/rearranged so the panel never
     /// gets stranded off-screen while running.
@@ -58,6 +71,7 @@ final class FloatingPanel: NSPanel {
 
     override func setFrameOrigin(_ point: NSPoint) {
         super.setFrameOrigin(point)
+        guard persistPosition else { return }
         settings.panelOriginX = point.x
         settings.panelOriginY = point.y
     }

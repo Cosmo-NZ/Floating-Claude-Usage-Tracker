@@ -30,4 +30,14 @@ enum PanelPlacement {
         }
         return fallbackOrigin(size: size, visibleFrames: visibleFrames)
     }
+
+    /// Bottom-left origin that places the panel just below a menu-bar icon, horizontally
+    /// centered under it and clamped inside the screen's visible area. (Bottom-left space.)
+    static func popoverOrigin(iconFrame: CGRect, panelSize: CGSize, visibleFrame: CGRect,
+                              gap: CGFloat = 4, margin: CGFloat = 8) -> CGPoint {
+        var x = iconFrame.midX - panelSize.width / 2
+        x = min(max(x, visibleFrame.minX + margin), visibleFrame.maxX - panelSize.width - margin)
+        let y = iconFrame.minY - panelSize.height - gap
+        return CGPoint(x: x, y: y)
+    }
 }
