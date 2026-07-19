@@ -42,8 +42,19 @@ struct PanelView: View {
             }
             Divider()
             HStack(spacing: 8) {
-                Circle().fill(statusColor).frame(width: 8, height: 8)
-                Text(store.snapshot.status.label).font(.system(size: 11)).foregroundStyle(.secondary)
+                Button {
+                    if let url = URL(string: "https://status.claude.com/") { NSWorkspace.shared.open(url) }
+                } label: {
+                    HStack(spacing: 8) {
+                        Circle().fill(statusColor).frame(width: 8, height: 8)
+                        Text(store.snapshot.status.label).font(.system(size: 11)).foregroundStyle(.secondary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .help("Open status.claude.com")
+                .onHover { inside in
+                    if inside { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                }
                 Spacer()
                 if let updated = store.snapshot.lastUpdated {
                     Text(updated, style: .time).font(.system(size: 10)).foregroundStyle(.tertiary)
