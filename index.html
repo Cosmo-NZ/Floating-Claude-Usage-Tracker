@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Usage Tracker — Help</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sidebar-width: 210px;
+    --accent: #D97757;
+    --bg: #f5f5f7;
+    --sidebar-bg: #1c1c1e;
+    --sidebar-text: #ebebf5cc;
+    --sidebar-active: #fff;
+    --sidebar-hover: #ffffff22;
+    --body-bg: #fff;
+    --text: #1d1d1f;
+    --secondary: #6e6e73;
+    --border: #d2d2d7;
+    --card-bg: #f5f5f7;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+    background: var(--bg);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    padding: 28px 0 20px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 18px 24px;
+    border-bottom: 1px solid #ffffff18;
+    margin-bottom: 12px;
+  }
+
+  .nav-logo .icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+  }
+
+  .nav-logo span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 18px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 13.5px;
+    border-radius: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  nav a:hover { background: var(--sidebar-hover); color: #fff; }
+  nav a.active { color: var(--sidebar-active); font-weight: 600; }
+
+  nav a .nav-icon { font-size: 14px; width: 18px; text-align: center; opacity: 0.8; }
+
+  /* ── Main content ── */
+  main {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 52px 48px 80px;
+    max-width: 860px;
+  }
+
+  section {
+    padding-top: 20px;
+    margin-bottom: 72px;
+    scroll-margin-top: 24px;
+  }
+
+  section:last-child { margin-bottom: 0; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.3px; }
+  h2 { font-size: 17px; font-weight: 600; margin: 28px 0 8px; color: var(--text); }
+
+  p { margin-bottom: 10px; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  .subsection { margin-top: 24px; }
+
+  code {
+    background: var(--card-bg);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 13px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  /* Steps */
+  ol.steps { list-style: none; padding: 0; margin: 8px 0 0; }
+  ol.steps li {
+    display: flex; gap: 12px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+  }
+  ol.steps li .num {
+    min-width: 22px; height: 22px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  /* Bullets */
+  ul.bullets { list-style: none; padding: 0; margin: 8px 0 0; }
+  ul.bullets li {
+    display: flex; gap: 10px;
+    margin-bottom: 7px;
+    align-items: flex-start;
+  }
+  ul.bullets li::before {
+    content: "•";
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Q&A cards */
+  .qa { background: var(--card-bg); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+  .qa .q { font-weight: 600; margin-bottom: 6px; }
+  .qa .a { color: var(--secondary); margin-bottom: 0; font-size: 14px; }
+
+  /* Callout box */
+  .callout {
+    background: #fbeae0;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  /* Key row diagram (panel anatomy) */
+  .kv-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-row .kv-label {
+    min-width: 150px;
+    font-weight: 600;
+    font-size: 13.5px;
+    flex-shrink: 0;
+  }
+  .kv-row .kv-desc { color: var(--secondary); font-size: 14px; }
+
+  /* Section colour themes */
+  #getting-started  .section-icon { background: #fff3e0; }
+  #panel            .section-icon { background: #e3f2fd; }
+  #connecting       .section-icon { background: #e8f5e9; }
+  #menubar          .section-icon { background: #fce4ec; }
+  #tracking         .section-icon { background: #fff8e1; }
+  #settings         .section-icon { background: #f3e5f5; }
+  #notifications    .section-icon { background: #e0f2f1; }
+  #faq              .section-icon { background: #ede7f6; }
+
+  /* Responsive: hide sidebar on small screens */
+  @media (max-width: 680px) {
+    nav { display: none; }
+    main { margin-left: 0; padding: 28px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="icon">📊</div>
+    <span>Claude Usage<br>Tracker<br>Help</span>
+  </div>
+  <a href="#getting-started"><span class="nav-icon">⭐</span> Getting Started</a>
+  <a href="#panel"><span class="nav-icon">🖥</span> The Floating Panel</a>
+  <a href="#connecting"><span class="nav-icon">🔑</span> Connecting Claude.ai</a>
+  <a href="#menubar"><span class="nav-icon">📍</span> Menu Bar Icon</a>
+  <a href="#tracking"><span class="nav-icon">📈</span> Extra Tracking</a>
+  <a href="#settings"><span class="nav-icon">⚙️</span> Settings</a>
+  <a href="#notifications"><span class="nav-icon">🔔</span> Notifications</a>
+  <a href="#faq"><span class="nav-icon">❓</span> FAQ</a>
+</nav>
+
+<main>
+
+  <!-- ── Getting Started ── -->
+  <section id="getting-started">
+    <div class="section-header">
+      <div class="section-icon">⭐</div>
+      <h1>Getting Started</h1>
+    </div>
+
+    <p>Claude Usage Tracker is a small floating panel that keeps your Claude subscription usage, live service availability, and (optionally) your API spend visible on your Mac — no need to open a browser and dig through account pages.</p>
+
+    <div class="subsection">
+      <h2>How it works</h2>
+      <p>The app checks your Claude.ai account and status.claude.com on a timer (every 30 seconds by default) and shows the results in a compact panel: how much of your 5‑hour session and weekly limits you've used, and whether Claude is currently having any issues.</p>
+    </div>
+
+    <div class="subsection">
+      <h2>First steps</h2>
+      <ol class="steps">
+        <li><div class="num">1</div><span>Find the panel — it floats in the corner of your screen. If you don't see it, click the <strong>◔</strong> icon in the menu bar.</span></li>
+        <li><div class="num">2</div><span>Click the gear icon in the panel to open <strong>Settings</strong>.</span></li>
+        <li><div class="num">3</div><span>Go to the <strong>Claude.ai</strong> section and click <strong>Sign in to Claude.ai</strong>.</span></li>
+        <li><div class="num">4</div><span>Once connected, your Session and Weekly usage bars fill in automatically.</span></li>
+        <li><div class="num">5</div><span>Decide whether you want the panel <strong>always visible</strong> or tucked away behind the menu bar icon — see Appearance in Settings.</span></li>
+      </ol>
+    </div>
+
+    <div class="callout">
+      <strong>Your credentials stay on your Mac.</strong> The Claude.ai session key and any API key you add are stored in the macOS Keychain. The app talks directly to Anthropic's own servers to fetch your usage — nothing passes through a third party.
+    </div>
+  </section>
+
+  <!-- ── The Floating Panel ── -->
+  <section id="panel">
+    <div class="section-header">
+      <div class="section-icon">🖥</div>
+      <h1>The Floating Panel</h1>
+    </div>
+
+    <div class="subsection">
+      <h2>Session and Weekly usage</h2>
+      <p>Each usage row shows two things at once: a bar for how much of your quota is used, and a thin vertical marker on the bar showing how far through the time window you currently are.</p>
+      <ul class="bullets">
+        <li>If the coloured fill is <strong>ahead of</strong> the marker, you're burning through that limit faster than the clock is moving.</li>
+        <li>If the fill is <strong>behind</strong> the marker, you're pacing comfortably.</li>
+        <li>The text underneath spells it out exactly, e.g. <em>"⧗ 3h 31m elapsed · resets 2:59 PM"</em>.</li>
+      </ul>
+      <p>The bar turns amber at 75% used and red at 90%, matching the thresholds used for notifications.</p>
+    </div>
+
+    <div class="subsection">
+      <h2>Availability</h2>
+      <p>The coloured dot and label at the bottom of the panel (Operational / Degraded / Outage) reflect Claude's live system status. Click it to open <strong>status.claude.com</strong> in your browser for more detail.</p>
+    </div>
+
+    <div class="subsection">
+      <h2>Panel controls</h2>
+      <div class="kv-row"><div class="kv-label">🔄 Refresh</div><div class="kv-desc">Fetches the latest usage and status right away, instead of waiting for the next scheduled check.</div></div>
+      <div class="kv-row"><div class="kv-label">⚙️ Gear</div><div class="kv-desc">Opens the Settings window.</div></div>
+      <div class="kv-row"><div class="kv-label">⏻ Power</div><div class="kv-desc">Quits Claude Usage Tracker.</div></div>
+      <div class="kv-row"><div class="kv-label">Always on top switch</div><div class="kv-desc">Also available directly in the panel's header — toggles whether the panel floats above every other window.</div></div>
+    </div>
+
+    <div class="subsection">
+      <h2>Moving the panel</h2>
+      <p>Drag anywhere on the panel's background to reposition it. Its location is remembered the next time you open the app. If a display gets disconnected or rearranged and the saved spot is no longer on screen, the panel automatically moves itself back to the top-right of your main display.</p>
+    </div>
+  </section>
+
+  <!-- ── Connecting Claude.ai ── -->
+  <section id="connecting">
+    <div class="section-header">
+      <div class="section-icon">🔑</div>
+      <h1>Connecting Claude.ai</h1>
+    </div>
+
+    <p>Claude Usage Tracker needs to be signed in to your Claude.ai account to read your Session and Weekly usage. This is a one-time setup.</p>
+
+    <div class="subsection">
+      <h2>Signing in</h2>
+      <ol class="steps">
+        <li><div class="num">1</div><span>Open <strong>Settings → Claude.ai</strong> and click <strong>Sign in to Claude.ai</strong>.</span></li>
+        <li><div class="num">2</div><span>A sign-in window opens. Use <strong>Continue with Google</strong>, or enter your email and the verification code Claude sends you.</span></li>
+        <li><div class="num">3</div><span>Once you land on your Claude.ai home page, the window closes automatically and your usage bars populate within a few seconds.</span></li>
+      </ol>
+    </div>
+
+    <div class="subsection">
+      <h2>Manual session key (Advanced)</h2>
+      <p>If the embedded sign-in doesn't work for you, the Claude.ai section also has an advanced field to paste a <code>sessionKey</code> cookie value directly.</p>
+    </div>
+
+    <div class="subsection">
+      <h2>Disconnecting</h2>
+      <p>Click <strong>Remove</strong> next to your connection status in Settings → Claude.ai to sign out and clear the stored key.</p>
+    </div>
+
+    <div class="subsection">
+      <h2>When your session expires</h2>
+      <p>If Claude.ai invalidates your session, the Session and Weekly rows will show "Not connected." Just sign in again the same way — nothing else needs to change.</p>
+    </div>
+  </section>
+
+  <!-- ── Menu Bar Icon ── -->
+  <section id="menubar">
+    <div class="section-header">
+      <div class="section-icon">📍</div>
+      <h1>Menu Bar Icon</h1>
+    </div>
+
+    <div class="subsection">
+      <h2>What it shows</h2>
+      <p>The menu bar icon displays your current Session usage as a compact percentage, e.g. <code>◔ 48%</code>, so you can glance at it without opening the panel at all.</p>
+    </div>
+
+    <div class="subsection">
+      <h2>Showing and hiding the panel</h2>
+      <p>How a click behaves depends on the <strong>Always on top</strong> setting:</p>
+      <ul class="bullets">
+        <li><strong>Always on top ON</strong> — the panel stays permanently visible; clicking the icon just brings it to the front.</li>
+        <li><strong>Always on top OFF</strong> — the panel is hidden until you need it. Left-click the icon to pop it up right underneath, and left-click again — or click anywhere outside the panel — to dismiss it.</li>
+      </ul>
+    </div>
+
+    <div class="subsection">
+      <h2>Right-click menu</h2>
+      <p>Right-click the icon for a quick menu with <strong>Settings…</strong> and <strong>Quit</strong>.</p>
+    </div>
+
+    <div class="callout">
+      Whenever <strong>Always on top</strong> is off, the menu bar icon is kept on automatically — it's the only way to summon the panel, so the app won't let you hide it.
+    </div>
+  </section>
+
+  <!-- ── Extra Tracking ── -->
+  <section id="tracking">
+    <div class="section-header">
+      <div class="section-icon">📈</div>
+      <h1>Extra Tracking</h1>
+    </div>
+
+    <p>Two additional rows can be switched on if you want more detail. Both are off by default and require nothing extra unless you enable them.</p>
+
+    <div class="subsection">
+      <h2>API console spend</h2>
+      <p>Shows how much you've spent this month on the Anthropic API console. Go to <strong>Settings → API Console</strong>, turn on <strong>Track API spend</strong>, and paste in an Anthropic Admin API key (starts with <code>sk-ant-admin…</code>). The figure is refreshed roughly every two minutes, since billing data doesn't change second to second.</p>
+    </div>
+
+    <div class="subsection">
+      <h2>Fable weekly usage</h2>
+      <p>Adds a <strong>Weekly (Fable)</strong> row showing your per-model weekly limit for Fable — the same figure shown in the Claude app's own usage area. Turn it on in <strong>Settings → Fable</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ── Settings ── -->
+  <section id="settings">
+    <div class="section-header">
+      <div class="section-icon">⚙️</div>
+      <h1>Settings</h1>
+    </div>
+
+    <div class="subsection">
+      <h2>General</h2>
+      <div class="kv-row"><div class="kv-label">Refresh interval</div><div class="kv-desc">A slider from 10 to 300 seconds (default 30s) controlling how often usage and status are checked.</div></div>
+      <div class="kv-row"><div class="kv-label">Threshold notifications</div><div class="kv-desc">Turns macOS notifications on or off for the 75% / 90% / 95% usage alerts — see Notifications below.</div></div>
+      <div class="kv-row"><div class="kv-label">Launch at login</div><div class="kv-desc">Starts Claude Usage Tracker automatically when you log in to your Mac.</div></div>
+    </div>
+
+    <div class="subsection">
+      <h2>Appearance</h2>
+      <div class="kv-row"><div class="kv-label">Always on top</div><div class="kv-desc">Keeps the panel permanently visible above other windows, or hides it behind the menu bar icon — see Menu Bar Icon.</div></div>
+      <div class="kv-row"><div class="kv-label">Panel opacity</div><div class="kv-desc">A slider from 30% (see-through) to 100% (solid), applied instantly, so the panel can sit unobtrusively over whatever's behind it.</div></div>
+      <div class="kv-row"><div class="kv-label">Show menu bar icon</div><div class="kv-desc">Can be turned off only while Always on top is on — otherwise it's kept on so the panel always has a way to be reopened.</div></div>
+    </div>
+  </section>
+
+  <!-- ── Notifications ── -->
+  <section id="notifications">
+    <div class="section-header">
+      <div class="section-icon">🔔</div>
+      <h1>Notifications</h1>
+    </div>
+
+    <p>When <strong>Threshold notifications</strong> is on (Settings → General), macOS notifies you as your Session or Weekly usage crosses <strong>75%</strong>, <strong>90%</strong>, and <strong>95%</strong>.</p>
+
+    <div class="subsection">
+      <h2>How they behave</h2>
+      <ul class="bullets">
+        <li>Each threshold fires only once per crossing — you won't be spammed while usage sits above 75%.</li>
+        <li>Once a limit resets (a new 5-hour session or a new week begins), the thresholds reset too, ready to fire again.</li>
+        <li>Session and Weekly limits are tracked independently, so crossing one doesn't affect the other.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div class="section-header">
+      <div class="section-icon">❓</div>
+      <h1>FAQ</h1>
+    </div>
+
+    <div class="qa">
+      <p class="q">The panel disappeared and I can't find it.</p>
+      <p class="a">If Always on top is off, the panel is hidden by design — click the ◔ icon in the menu bar to bring it back. If it was on and still seems to be missing, it may have been positioned off-screen after a display was disconnected or rearranged; the app automatically detects that and moves the panel back to the top-right of your main screen the next time it checks.</p>
+    </div>
+
+    <div class="qa">
+      <p class="q">My usage bars say "Not connected."</p>
+      <p class="a">Your Claude.ai session has most likely expired. Open Settings → Claude.ai and click Sign in to Claude.ai again — it only takes a few seconds.</p>
+    </div>
+
+    <div class="qa">
+      <p class="q">Why is the API spend row blank, or slow to update?</p>
+      <p class="a">Make sure Track API spend is switched on in Settings → API Console and that a valid Admin API key has been saved. Spend figures are also refreshed at most once every two minutes, even if your refresh interval is set lower, since billing data changes slowly.</p>
+    </div>
+
+    <div class="qa">
+      <p class="q">Is my data safe?</p>
+      <p class="a">Your Claude.ai session key and any API key are stored in the macOS Keychain, not in a plain file. The app connects directly to Anthropic's and Claude's own servers to fetch your usage — there's no analytics, telemetry, or third-party server involved.</p>
+    </div>
+
+    <div class="qa">
+      <p class="q">Does this use an official Anthropic API?</p>
+      <p class="a">Subscription usage and availability use the same internal endpoints the Claude.ai website itself relies on. They aren't officially documented, so an unannounced change on Anthropic's side could occasionally cause a reading to go blank until the app is updated. API spend, by contrast, uses Anthropic's official Cost Report API.</p>
+    </div>
+
+    <div class="qa">
+      <p class="q">How do I quit the app?</p>
+      <p class="a">Click the power icon in the panel's footer, or right-click the menu bar icon and choose Quit.</p>
+    </div>
+
+    <div class="qa">
+      <p class="q">How do I get a newer version?</p>
+      <p class="a">Download the latest .dmg from the project's GitHub Releases page (github.com/Cosmo-NZ/Floating-Claude-Usage-Tracker/releases) and drag it into Applications, replacing the previous version. Your Claude.ai connection and settings are preserved.</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Highlight active nav link based on scroll position
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  function updateActive() {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 60) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+
+</body>
+</html>
