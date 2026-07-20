@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct SettingsView: View {
     @Bindable var settings: AppSettings
@@ -8,7 +9,7 @@ struct SettingsView: View {
 
     enum Section: String, CaseIterable, Identifiable {
         case claude = "Claude.ai", api = "API Console", fable = "Fable",
-             general = "General", appearance = "Appearance"
+             general = "General", appearance = "Appearance", about = "About"
         var id: String { rawValue }
         var icon: String {
             switch self {
@@ -17,6 +18,7 @@ struct SettingsView: View {
             case .fable: return "sparkles"
             case .general: return "gearshape"
             case .appearance: return "paintbrush"
+            case .about: return "info.circle"
             }
         }
     }
@@ -47,6 +49,7 @@ struct SettingsView: View {
         case .fable: fablePane
         case .general: generalPane
         case .appearance: appearancePane
+        case .about: aboutPane
         }
     }
 
@@ -176,6 +179,48 @@ struct SettingsView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
+        }
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+    }
+
+    private var aboutPane: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 12) {
+                if let icon = NSApplication.shared.applicationIconImage {
+                    Image(nsImage: icon).resizable().frame(width: 48, height: 48)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Claude Usage Tracker").font(.title2.bold())
+                    Text("Version \(appVersion)").foregroundStyle(.secondary)
+                }
+            }
+            Divider()
+            VStack(alignment: .leading, spacing: 10) {
+                linkRow(icon: "globe", title: "CramerLabs", url: "https://www.cramerlabs.com")
+                linkRow(icon: "chevron.left.slash.chevron.right", title: "GitHub Repository",
+                        url: "https://github.com/Cosmo-NZ/Floating-Claude-Usage-Tracker")
+            }
+        }
+    }
+
+    private func linkRow(icon: String, title: String, url: String) -> some View {
+        Button {
+            if let u = URL(string: url) { NSWorkspace.shared.open(u) }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: icon).frame(width: 18)
+                Text(title)
+                Spacer()
+                Image(systemName: "arrow.up.right").font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.primary)
+        .onHover { inside in
+            if inside { NSCursor.pointingHand.push() } else { NSCursor.pop() }
         }
     }
 }
