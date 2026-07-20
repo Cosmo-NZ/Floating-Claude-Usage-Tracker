@@ -9,7 +9,7 @@ struct SettingsView: View {
 
     enum Section: String, CaseIterable, Identifiable {
         case claude = "Claude.ai", api = "API Console", fable = "Fable",
-             general = "General", appearance = "Appearance", about = "About"
+             general = "General", appearance = "Appearance", about = "About", help = "Help"
         var id: String { rawValue }
         var icon: String {
             switch self {
@@ -19,6 +19,7 @@ struct SettingsView: View {
             case .general: return "gearshape"
             case .appearance: return "paintbrush"
             case .about: return "info.circle"
+            case .help: return "questionmark.circle"
             }
         }
     }
@@ -50,6 +51,7 @@ struct SettingsView: View {
         case .general: generalPane
         case .appearance: appearancePane
         case .about: aboutPane
+        case .help: helpPane
         }
     }
 
@@ -203,6 +205,17 @@ struct SettingsView: View {
                 linkRow(icon: "chevron.left.slash.chevron.right", title: "GitHub Repository",
                         url: "https://github.com/Cosmo-NZ/Floating-Claude-Usage-Tracker")
             }
+        }
+    }
+
+    private var helpPane: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Help").font(.title2.bold())
+            Text("Open the full help guide covering the floating panel, connecting Claude.ai, extra tracking, and more.")
+                .foregroundStyle(.secondary)
+            Divider()
+            linkRow(icon: "book", title: "Open Help Guide",
+                    url: "https://cosmo-nz.github.io/Floating-Claude-Usage-Tracker/")
         }
     }
 
